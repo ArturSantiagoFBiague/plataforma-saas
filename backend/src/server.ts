@@ -1,15 +1,10 @@
-// backend/src/server.ts
-import express from "express"
-import * as dotenv from "dotenv"
-import cors from "cors"
-import authRoutes from "./routes/authRoutes"
+import app from './app';
+import dotenv from 'dotenv';
 
-dotenv.config()
+dotenv.config();
 
-const app = express()
-app.use(cors())
-app.use(express.json())
+const PORT = process.env.PORT || 3000;
 
-app.use("/api/auth", authRoutes)
-
-export default app
+app.listen(PORT, () => {
+  console.log(`🚀 Servidor rodando em http://localhost:${PORT}`);
+});

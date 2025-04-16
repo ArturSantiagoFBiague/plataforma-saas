@@ -1,63 +1,44 @@
 version: '3.8'
 services:
-  frontend:
-    build: ./frontend
-    ports:
-      - "3000:3000"
-    depends_on:
-      backend:
-        condition: service_healthy
-    networks:
-      - app-network
-    restart: always
-    healthcheck:
-      test: ["CMD", "curl", "-s", "http://localhost:3000"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
-      start_period: 5s
-
-
-  backend:
-    build: ./backend
-    ports:
-      - "5000:5000"
-    env_file:
-      - .env
-    depends_on:
-      db:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
-      interval: 10s
-      retries: 3
-      start_period: 5s
-      timeout: 5s
-    networks:
-      - app-network
-    restart: always
-
   db:
-    image: postgres:14
+    image: postgres:16
+    container_name: db
+    restart: always
     environment:
       POSTGRES_USER: saas
-      POSTGRES_PASSWORD: saaspass
-      POSTGRES_DB: plataforma
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U saas -d plataforma"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
+      POSTGRES_PASSWORD: senha_segura
+      POSTGRES_DB: plataforma          # Banco de dados inicial
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - ./db/init.sh  # Script de inicialização
     ports:
-      - "5432:5432"
+      - "5432:5432"  # Mapeando a porta do banco de dados
     networks:
-      - app-network
+      - plataforma-saas-network
 
-volumes:
-  pgdata:
+  backend:
+    build:
+      context: ./backend
+    container_name: plataforma-saas_backend
+    environment:
+      DATABASE_URL: postgres://saas:senha_segura@db:5432/plataforma
+    depends_on:
+      - db
+    ports:
+      - "3000:3000"
+    networks:
+      - plataforma-saas-network
+    command: ["sh", "-c", "sleep 10 && npm start"]
+
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: plataforma-saas_frontend
+    ports:
+      - "3001:3000"  # Mapeando a porta do frontend
+    networks:
+      - plataforma-saas-network
 
 networks:
-  app-network:
+  plataforma-saas-network:
     driver: bridge
