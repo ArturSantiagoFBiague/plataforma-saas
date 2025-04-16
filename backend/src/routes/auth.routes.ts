@@ -1,10 +1,9 @@
 import { Router } from 'express';
-import { login, register } from '../controllers/auth.controller';  // Importando os controladores
+import { login, register } from '../controllers/auth.controller';
 
 const router = Router();
 
-// Definição das rotas de autenticação
-router.post('/login', login);  // Rota para login
-router.post('/register', register);  // Rota para registro
+router.post('/login', login);
+router.post('/register', register);
 
 export default router;

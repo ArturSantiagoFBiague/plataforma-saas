@@ -1,19 +1,16 @@
 #!/bin/sh
 
-# Espera o banco de dados ficar disponível
 echo "Aguardando o banco de dados ficar disponível..."
 
-# Aguarda até conseguir conexão com o banco
-until nc -z -v -w30 db 5432
-do
-  echo "Aguardando o PostgreSQL..."
-  sleep 2
+until nc -z db 5432; do
+  sleep 1
 done
 
-# Aplica as migrações (se houver)
-echo "Executando as migrações do banco de dados..."
-npx prisma migrate deploy
+echo "Banco de dados disponível! Rodando migrations..."
 
-# Inicia a aplicação
-echo "Iniciando o servidor..."
-npm start
+npx prisma migrate dev --name init 
+docker-compose exec backend npx prisma migrate deploy
+npx prisma generate
+
+echo "Iniciando aplicação..."
+npm run dev

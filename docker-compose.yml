@@ -1,4 +1,5 @@
 version: '3.8'
+
 services:
   db:
     image: postgres:16
@@ -7,11 +8,12 @@ services:
     environment:
       POSTGRES_USER: saas
       POSTGRES_PASSWORD: senha_segura
-      POSTGRES_DB: plataforma          # Banco de dados inicial
+      POSTGRES_DB: plataforma
     volumes:
-      - ./db/init.sh  # Script de inicialização
+      - ./db/init.sh:/docker-entrypoint-initdb.d/init.sh  # Corrigido: montar corretamente como script
+      - db_data:/var/lib/postgresql/data  # Volume persistente para os dados do banco
     ports:
-      - "5432:5432"  # Mapeando a porta do banco de dados
+      - "5432:5432"
     networks:
       - plataforma-saas-network
 
@@ -20,24 +22,35 @@ services:
       context: ./backend
     container_name: plataforma-saas_backend
     environment:
-      DATABASE_URL: postgres://saas:senha_segura@db:5432/plataforma
+      DATABASE_URL: postgresql://saas:senha_segura@db:5432/plataforma
+      NODE_ENV: development
+      PORT: 3000
+      JWT_SECRET: your_jwt_secret_key
     depends_on:
       - db
+    volumes:
+      - ./backend:/app
+    working_dir: /app
     ports:
       - "3000:3000"
     networks:
       - plataforma-saas-network
-    command: ["sh", "-c", "sleep 10 && npm start"]
-
+    entrypoint: ["./entrypoint.sh"]
 
   frontend:
     build:
       context: ./frontend
     container_name: plataforma-saas_frontend
     ports:
-      - "3001:3000"  # Mapeando a porta do frontend
+      - "3001:3000"
     networks:
       - plataforma-saas-network
+    volumes:
+      - ./frontend:/app
+    working_dir: /app
+
+volumes:
+  db_data:
 
 networks:
   plataforma-saas-network:

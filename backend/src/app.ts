@@ -2,17 +2,14 @@ import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
-import authRoutes from './routes/auth.routes'; // Rota de autenticação
-import userRoutes from './routes/users.routes'; // Rota de usuários
+import authRoutes from './routes/auth.routes';
+import userRoutes from './routes/users.routes';
 import { PrismaClient } from '@prisma/client';
-import { Router } from 'express';
 import { authenticate } from './middlewares/auth.middleware';
 
-dotenv.config(); // Carregar as variáveis de ambiente
+dotenv.config();
 
 const app = express();
-
-app.use('/api/users', authenticate, userRoutes);  // Protege as rotas de usuários
 const prisma = new PrismaClient();
 
 // Middlewares globais
@@ -29,8 +26,8 @@ prisma.$connect()
   });
 
 // Rotas
-app.use('/api/auth', authRoutes);  // Prefixo para rotas de autenticação
-app.use('/api/users', userRoutes); // Prefixo para rotas de usuários
+app.use('/api/auth', authRoutes); // Rotas de autenticação
+app.use('/api/users', authenticate, userRoutes); // Rotas protegidas de usuários
 
 // Middleware para rota não encontrada
 app.use((req, res) => {

@@ -1,12 +1,12 @@
 // Define o provedor do banco e o caminho do client gerado
-generator client {
-  provider = "prisma-client-js"
-}
 
 // Configuração do banco de dados
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+generator client {
+  provider = "prisma-client-js"
 }
 
 // Modelos

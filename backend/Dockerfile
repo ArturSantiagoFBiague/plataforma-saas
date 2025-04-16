@@ -11,7 +11,9 @@ COPY package*.json ./
 RUN npm install cors bcryptjs \
   && npm install --legacy-peer-deps \
   && npm install --save-dev @types/bcryptjs @types/cors prisma \
-  && npm install @prisma/client
+  && npm install @prisma/client 
+
+
 
 # Copia todo o código, incluindo .env e scripts
 COPY . .

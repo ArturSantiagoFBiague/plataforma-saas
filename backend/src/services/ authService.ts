@@ -2,6 +2,11 @@ import { prisma } from '../lib/prisma';
 import { comparePasswords, hashPassword } from '../lib/hash';
 import { generateToken } from '../lib/jwt';
 
+interface AuthPayload {
+  id: number;
+  email: string;
+}
+
 export const login = async (email: string, password: string) => {
   const user = await prisma.user.findUnique({ where: { email } });
 
@@ -10,7 +15,6 @@ export const login = async (email: string, password: string) => {
   }
 
   const isPasswordValid = await comparePasswords(password, user.password);
-
   if (!isPasswordValid) {
     throw new Error('Senha inválida');
   }
@@ -19,18 +23,19 @@ export const login = async (email: string, password: string) => {
 
   return { user, token };
 };
-export const register = async (email: string, password: string) => {
+
+export const register = async (name: string, email: string, password: string) => {
   const existingUser = await prisma.user.findUnique({ where: { email } });
 
   if (existingUser) {
-    throw new Error('Usuário já existe');
+    throw new Error('E-mail já está em uso');
   }
 
   const hashedPassword = await hashPassword(password);
 
   const newUser = await prisma.user.create({
     data: {
-      name: "nome do usuario",
+      name,
       email,
       password: hashedPassword,
     },
