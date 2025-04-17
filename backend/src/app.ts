@@ -6,14 +6,18 @@ import authRoutes from './routes/auth.routes';
 import userRoutes from './routes/users.routes';
 import { PrismaClient } from '@prisma/client';
 import { authenticate } from './middlewares/auth.middleware';
-
 dotenv.config();
 
 const app = express();
 const prisma = new PrismaClient();
 
 // Middlewares globais
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:5173', // Permite todas as origens (ajuste conforme necessário)
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
+}));
 app.use(express.json());
 app.use(morgan('dev'));
 
@@ -35,3 +39,5 @@ app.use((req, res) => {
 });
 
 export default app;
+
+

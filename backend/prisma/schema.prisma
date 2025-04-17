@@ -15,6 +15,7 @@ model User {
   email          String   @unique
   password       String
   name           String   // <--- Adicione isso
+  phone          String?   @unique
   role           Role     @default(USER)
   active         Boolean  @default(true)
   createdAt      DateTime @default(now())

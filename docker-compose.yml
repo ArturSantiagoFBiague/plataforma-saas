@@ -42,7 +42,7 @@ services:
       context: ./frontend
     container_name: plataforma-saas_frontend
     ports:
-      - "3001:3000"
+      - "3002:3000"
     networks:
       - plataforma-saas-network
     volumes:

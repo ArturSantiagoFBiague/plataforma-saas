@@ -1,1 +1,0 @@
-@tailwind base;@tailwind components;@tailwind utilities;@layer base{html{font-size:16px}}@layer components{.btn{@apply px-4 py-2 bg-blue-500 text-white rounded;}}@layer utilities{.bg-custom{background-color:#f0f0f0}}
