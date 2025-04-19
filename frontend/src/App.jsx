@@ -1,22 +1,28 @@
 // src/App.jsx
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "./contexts/AuthContext";
+
 import Home from "./pages/Home";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
-import { AuthProvider } from "./contexts/AuthContext";
+import AdminDashboard from "./pages/AdminDashboard";
+
 import PrivateRoute from "./routes/PrivateRoute";
+import AdminRoute from "./routes/AdminRoute";
 
 function App() {
   return (
     <Router>
-      <div className="min-h-screen bg-gray-50 text-gray-800">
-        <AuthProvider>
+      <AuthProvider>
+        <div className="min-h-screen bg-gray-50 text-gray-800">
           <Routes>
-            
+            {/* Rotas públicas */}
             <Route path="/" element={<Home />} />
             <Route path="/register" element={<Register />} />
             <Route path="/login" element={<Login />} />
+
+            {/* Rotas privadas */}
             <Route
               path="/dashboard"
               element={
@@ -25,10 +31,19 @@ function App() {
                 </PrivateRoute>
               }
             />
-            {/* Outras rotas podem ser adicionadas aqui futuramente */}
+
+            {/* Rotas de administrador */}
+            <Route
+              path="/admin"
+              element={
+                <AdminRoute>
+                  <AdminDashboard />
+                </AdminRoute>
+              }
+            />
           </Routes>
-        </AuthProvider>
-      </div>
+        </div>
+      </AuthProvider>
     </Router>
   );
 }

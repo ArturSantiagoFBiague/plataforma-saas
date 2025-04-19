@@ -1,17 +1,21 @@
 import { Router } from 'express';
 import { login, register } from '../controllers/auth.controller';
-import { authenticate } from "../middlewares/auth.middleware";
-import { JwtPayload } from 'jsonwebtoken';
+import { authenticate, AuthRequest } from '../middlewares/auth.middleware';
 
 const router = Router();
 
 router.post('/login', login);
 router.post('/register', register);
-router.get("/me", authenticate, async (req, res) => {
-    const user = req.user as JwtPayload;
-    if (!user || typeof user === "string") {
-        return res.status(401).json({ error: "Unauthorized" });
-    }
-    res.json({ id: user.id, name: user.name, email: user.email });
-  });
+
+// Rota protegida para retornar os dados do usuário autenticado
+router.get('/me', authenticate, (req: AuthRequest, res) => {
+  if (!req.user) {
+    return res.status(401).json({ error: 'Não autorizado' });
+  }
+
+  const { id, name, email } = req.user;
+
+  return res.status(200).json({ id, name, email });
+});
+
 export default router;

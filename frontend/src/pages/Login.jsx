@@ -1,7 +1,7 @@
 // src/pages/Login.jsx
 import { useState } from "react";
-import { login } from "../services/auth";
 import { useNavigate, Link } from "react-router-dom";
+import api from "../services/api";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -17,11 +17,24 @@ export default function Login() {
     setError("");
 
     try {
-      await login(form);
-      navigate("/dashboard");
+      const response = await api.post("/auth/login", form);
+      const { token, user } = response.data;
+
+      if (!token) {
+        throw new Error("Token não retornado pela API.");
+      }
+
+      localStorage.setItem("token", token);
+
+      // Aguarde a atualização do estado do usuário no contexto
+      if (user.role === "ADMIN") {
+        navigate("/admin");
+      } else {
+        navigate("/dashboard");
+      }
     } catch (err) {
-      console.error(err);
-      setError("Credenciais inválidas. Tente novamente.");
+      console.error("Erro no login:", err);
+      setError("Credenciais inválidas ou erro no servidor.");
     }
   };
 

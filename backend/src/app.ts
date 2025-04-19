@@ -6,14 +6,15 @@ import authRoutes from './routes/auth.routes';
 import userRoutes from './routes/users.routes';
 import { PrismaClient } from '@prisma/client';
 import { authenticate } from './middlewares/auth.middleware';
+import cookieParser from "cookie-parser";
 dotenv.config();
 
 const app = express();
 const prisma = new PrismaClient();
-
+app.use(cookieParser());
 // Middlewares globais
 app.use(cors({
-  origin: 'http://localhost:5173', // Permite todas as origens (ajuste conforme necessário)
+  origin: 'http://localhost:3002', // Permite todas as origens (ajuste conforme necessário)
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
