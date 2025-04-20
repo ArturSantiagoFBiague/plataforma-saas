@@ -1,10 +1,9 @@
-import { Response, NextFunction } from 'express';
-import { AuthRequest } from './auth.middleware';
+import { Request, Response, NextFunction } from 'express';
 
-export function isAdmin(req: AuthRequest, res: Response, next: NextFunction) {
-  if (!req.user || req.user.role !== 'ADMIN') {
-    return res.status(403).json({ message: 'Acesso negado: apenas administradores.' });
+export const isAdmin = (req: Request, res: Response, next: NextFunction) => {
+  const user = req.user;
+  if (!user || user.role !== 'ADMIN') {
+    return res.status(403).json({ message: 'Acesso restrito a administradores' });
   }
-
   next();
-}
+};

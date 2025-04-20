@@ -2,9 +2,9 @@
 
 echo "Aguardando o banco de dados ficar disponível..."
 
-until nc -z db 5432; do
+until nc -z 172.17.0.1 5432; do
   sleep 1
-done
+done  
 
 echo "Banco de dados disponível! Rodando migrations..."
 

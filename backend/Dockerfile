@@ -6,7 +6,7 @@ WORKDIR /app
 
 # Copia os arquivos de dependência
 COPY package*.json ./
-
+RUN apk update && apk add postgresql-client
 # Instala dependências
 RUN npm install cors bcryptjs \
   && npm install --legacy-peer-deps \

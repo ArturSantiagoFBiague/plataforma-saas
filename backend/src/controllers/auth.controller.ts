@@ -12,7 +12,7 @@ const generateToken = (userId: string) => {
 };
 
 export const login = async (req: Request, res: Response) => {
-  const { email, password } = req.body;
+  const { email, password,role } = req.body;
 
   if (!email || !password) {
     return res.status(400).json({ message: 'E-mail e senha são obrigatórios' });
@@ -101,4 +101,24 @@ export const register = async (req: Request, res: Response) => {
 export const logout = (_req: Request, res: Response) => {
   res.clearCookie('token');
   return res.status(200).json({ message: 'Logout bem-sucedido' });
+};
+export const getMe = async (req: Request, res: Response) => {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: req.params.id },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true, // <- importante!
+      },
+    });
+
+    if (!user) return res.status(404).json({ message: 'Usuário não encontrado' });
+
+    return res.json(user);
+  } catch (error) {
+    console.error('Erro ao buscar usuário:', error);
+    return res.status(500).json({ message: 'Erro interno do servidor' });
+  }
 };

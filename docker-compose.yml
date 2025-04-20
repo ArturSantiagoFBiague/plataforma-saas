@@ -1,38 +1,22 @@
 version: '3.8'
 
 services:
-  db:
-    image: postgres:16
-    container_name: db
-    restart: always
-    environment:
-      POSTGRES_USER: saas
-      POSTGRES_PASSWORD: senha_segura
-      POSTGRES_DB: plataforma
-    volumes:
-      - ./db/init.sh:/docker-entrypoint-initdb.d/init.sh  # Corrigido: montar corretamente como script
-      - db_data:/var/lib/postgresql/data  # Volume persistente para os dados do banco
-    ports:
-      - "5432:5432"
-    networks:
-      - plataforma-saas-network
-
   backend:
     build:
       context: ./backend
     container_name: plataforma-saas_backend
     environment:
-      DATABASE_URL: postgresql://saas:senha_segura@db:5432/plataforma
+      DATABASE_URL: postgresql://saas:senha_segura@172.17.0.1:5432/plataforma
       NODE_ENV: development
       PORT: 3000
       JWT_SECRET: your_jwt_secret_key
-    depends_on:
-      - db
+
     volumes:
       - ./backend:/app
     working_dir: /app
     ports:
       - "3000:3000"
+      - "5555:5555"
     networks:
       - plataforma-saas-network
     entrypoint: ["./entrypoint.sh"]
@@ -48,6 +32,22 @@ services:
     volumes:
       - ./frontend:/app
     working_dir: /app
+
+  videowall:
+    build: ./videowall
+    container_name: plataforma-saas_videowall
+    restart: always
+    volumes:
+      - ./videowall:/app
+      - ./uploads:/app/uploads
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql://saas:senha_segura@172.17.0.1:5432/plataforma
+    networks:
+      - plataforma-saas-network
+    command: >
+      bash -c "python wait_for_db.py && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
 
 volumes:
   db_data:

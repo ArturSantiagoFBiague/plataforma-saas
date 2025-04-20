@@ -1,3 +1,4 @@
+//frontend/src/services/users.js
 import api from "./api";
 
 export const getUsers = () => api.get("/users");

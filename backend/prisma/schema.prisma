@@ -1,35 +1,107 @@
-// Define o provedor do banco e o caminho do client gerado
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["multiSchema"]
+}
 
-// Configuração do banco de dados
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-}
-generator client {
-  provider = "prisma-client-js"
+  schemas  = ["novoschema"]
 }
 
-// Modelos
 model User {
-  id             String   @id @default(uuid())
-  email          String   @unique
-  password       String
-  name           String   // <--- Adicione isso
-  phone          String?   @unique
-  role           Role     @default(USER)
-  active         Boolean  @default(true)
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  id           String        @id @default(uuid())
+  email        String        @unique
+  password     String
+  name         String
+  role         Role          @default(USER)
+  active       Boolean       @default(true)
+  userPlan     PlanType?     @default(STAND)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  phone        String?       @unique
+  transactions Transaction[]
+
+  @@schema("novoschema")
 }
 
-model plan {
-  id          String   @id @default(uuid())
-  name        String
-  description String
-  price       Float
-  features    String[]
+model Plan {
+  id           String        @id @default(uuid())
+  name         String
+  description  String
+  price        Float
+  features     String[]
+  transactions Transaction[]
+
+  @@schema("novoschema")
 }
+
+model Transaction {
+  id        String   @id @default(uuid())
+  userId    String
+  planId    String
+  pixKey    String
+  qrCode    String
+  status    String  @default("pending")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  plan      Plan     @relation(fields: [planId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@schema("novoschema")
+}
+
+model dados_exibicao {
+  id              String      @id @db.Uuid
+  propaganda_id   String      @db.Uuid
+  inicio_exibicao DateTime?   @db.Timestamp(6)
+  fim_exibicao    DateTime?   @db.Timestamp(6)
+  prioridade      Int?
+  frequencia      Int?
+  criado_em       DateTime?   @default(dbgenerated("'2025-04-29 03:03:05.215789'::timestamp without time zone")) @db.Timestamp(6)
+  propagandas     propagandas @relation(fields: [propaganda_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@schema("novoschema")
+}
+
+model empresas {
+  id          String        @id @db.Uuid
+  nome        String        @db.VarChar
+  cnpj        String?       @db.VarChar
+  email       String?       @db.VarChar
+  telefone    String?       @db.VarChar
+  plano_ativo Boolean?
+  criado_em   DateTime?     @default(dbgenerated("'2025-04-29 03:03:05.215789'::timestamp without time zone")) @db.Timestamp(6)
+  propagandas propagandas[]
+
+  @@schema("novoschema")
+}
+
+model propagandas {
+  id             String           @id @db.Uuid
+  empresa_id     String           @db.Uuid
+  titulo         String           @db.VarChar
+  descricao      String?          @db.VarChar
+  imagem_caminho String           @db.VarChar
+  status         String?          @db.VarChar
+  criado_em      DateTime?        @default(dbgenerated("'2025-04-29 03:03:05.215789'::timestamp without time zone")) @db.Timestamp(6)
+  atualizado_em  DateTime?        @default(dbgenerated("'2025-04-29 03:03:05.215789'::timestamp without time zone")) @db.Timestamp(6)
+  dados_exibicao dados_exibicao[]
+  empresas       empresas         @relation(fields: [empresa_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@schema("novoschema")
+}
+
 enum Role {
   USER
   ADMIN
+
+  @@schema("novoschema")
+}
+enum PlanType {  
+  STAND
+  VIDEOWALL
+  BETADOC
+  ALL
+  @@schema("novoschema")
 }

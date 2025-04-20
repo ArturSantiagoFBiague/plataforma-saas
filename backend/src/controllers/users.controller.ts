@@ -1,3 +1,4 @@
+//backend/src/controllers/users.controller.ts
 import { Request, Response } from 'express';
 import { prisma } from '../lib/prisma';
 
@@ -39,13 +40,43 @@ export const updateUser = async (req: Request, res: Response) => {
   }
 };
 
-export const deleteUser = async (req: Request, res: Response) => {
-  const { id } = req.params;
+export const  deleteUser = async (req: Request, res: Response) => {
+  const userId = req.params.id;
 
   try {
-    await prisma.user.delete({ where: { id } });
-    res.status(204).send();
-  } catch (err) {
-    res.status(500).json({ message: 'Erro ao deletar usuário', error: err });
+    console.warn(`Procurando usuario  : ${userId}`);
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+
+    if (!user) {
+      console.warn(`Usuário não encontrado: ${userId}`);
+      return res.status(404).json({ error: 'Usuário não encontrado' });
+    }
+
+    await prisma.user.delete({ where: { id: userId } });
+
+    return res.status(200).json({ message: 'Usuário deletado com sucesso' });
+  } catch (error) {
+    console.error('Erro ao deletar usuário:', error);
+    return res.status(500).json({ error: 'Erro interno ao deletar usuário' });
   }
 };
+
+export const getAllUsers = async (req: Request, res: Response) => {
+  try {
+    const users = await prisma.user.findMany({
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        phone: true,
+        role: true,
+        createdAt: true,
+      },
+    });
+    return res.status(200).json({ users });
+  } catch (error) {
+    console.error('Erro ao buscar dados de admin:', error);
+    return res.status(500).json({ message: 'Erro interno do servidor' });
+  }
+};
+

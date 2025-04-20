@@ -13,9 +13,9 @@ router.get('/me', authenticate, (req: AuthRequest, res) => {
     return res.status(401).json({ error: 'Não autorizado' });
   }
 
-  const { id, name, email } = req.user;
+  const { id, name, email, role } = req.user;
 
-  return res.status(200).json({ id, name, email });
+  return res.status(200).json({ id, name, email, role });
 });
 
 export default router;

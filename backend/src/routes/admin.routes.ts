@@ -1,27 +1,26 @@
-import express from 'express';
+import axios from 'axios';
+import { Router } from 'express';
+import { prisma } from '../controllers/plans.controller';
+
+import { isAdmin } from '../middlewares/admin.middleware';
 import { authenticate } from '../middlewares/auth.middleware';
-import  { isAdmin }  from '../middlewares/admin.middleware';
-import { prisma } from '../lib/prisma';
 
-const router = express.Router();
+import { getAllUsers } from '../controllers/users.controller';
+import { getAdminDashboard, approveTransaction, createPlan, getTransactions } from '../controllers/admin.controller';
 
-router.get('/admin', authenticate, isAdmin, async (req, res) => {
-  try {
-    const users = await prisma.user.findMany({
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        role: true,
-        createdAt: true,
-      },
-    });
+const router = Router();
 
-    res.json(users);
-  } catch (err) {
-    console.error('Erro ao buscar usuários:', err);
-    res.status(500).json({ message: 'Erro interno do servidor.' });
-  }
-});
+// Rota protegida e exclusiva para administradores
+router.get('/users', authenticate, isAdmin, getAllUsers);
+router.get('/dashboard', isAdmin, getAdminDashboard);
+
+router.post('/plans', isAdmin, createPlan);
+
+router.patch('/transactions/:id/approve', isAdmin, approveTransaction);
+
+router.get('/transactions', authenticate, isAdmin, getTransactions);
+
+
+
 
 export default router;

@@ -1,12 +1,14 @@
-import { Navigate } from "react-router-dom";
-import { useAuth } from "../contexts/AuthContext";
+// AdminRoute.jsx
+import { Navigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function AdminRoute({ children }) {
   const { user, loading } = useAuth();
+  console.log("Tentativa de login ADMIN:", user);
 
-  if (loading) return <p>Carregando...</p>;
+  if (loading) return <div>Carregando...</div>;
+  if (!user || user.role !== 'ADMIN') return <Navigate to="/" />;
+  console.log("user em AdminRoute:", user);
 
-  if (!user) return <Navigate to="/login" />;
-
-  return user.role === "ADMIN" ? children : <Navigate to="/admin" />;
+  return children;
 }

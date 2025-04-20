@@ -6,6 +6,7 @@ export default defineConfig({
   plugins: [react()],
   server: {
     host: true,         // <- permite acesso externo (ex: localhost)
-    port: 3000,         // opcional, mas bom fixar
+    port: 3000, 
+    historyApiFallback: true        // opcional, mas bom fixar
   },
 });

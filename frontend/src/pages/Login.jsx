@@ -28,7 +28,7 @@ export default function Login() {
 
       // Aguarde a atualização do estado do usuário no contexto
       if (user.role === "ADMIN") {
-        navigate("/admin");
+        navigate("/admin/home");
       } else {
         navigate("/dashboard");
       }

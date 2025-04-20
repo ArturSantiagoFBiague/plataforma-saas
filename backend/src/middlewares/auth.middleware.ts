@@ -1,7 +1,23 @@
 import { Request, Response, NextFunction } from 'express';
+
+// Extending the Request interface to include the user property
+declare global {
+  namespace Express {
+    interface Request {
+      user?: {
+        id: string;
+        email: string;
+        name: string;
+        phone: string;
+        role: string;
+      };
+    }
+  }
+}
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import { prisma } from '../lib/prisma';
 
+import { JWT_SECRET } from '../lib/jwt';
 // Estendendo o Request para incluir o usuário autenticado
 export interface AuthRequest extends Request {
   user?: {
@@ -45,3 +61,5 @@ export const authenticate = async (req: AuthRequest, res: Response, next: NextFu
     return res.status(401).json({ message: 'Token inválido ou expirado' });
   }
 };
+
+

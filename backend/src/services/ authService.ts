@@ -19,7 +19,7 @@ export const login = async (email: string, password: string) => {
     throw new Error('Senha inválida');
   }
 
-  const token = generateToken({ id: user.id, email: user.email });
+  const token = generateToken({ id: user.id, email: user.email, role: user.role });
 
   return { user, token };
 };
@@ -41,7 +41,7 @@ export const register = async (name: string, email: string, password: string) =>
     },
   });
 
-  const token = generateToken({ id: newUser.id, email: newUser.email });
+  const token = generateToken({ id: newUser.id, email: newUser.email, role: newUser.role });
 
   return { user: newUser, token };
 };
